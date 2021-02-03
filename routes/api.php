@@ -14,13 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Authentication routes
 Route::post('/login', 'AuthController@login');
 Route::post('/register', 'AuthController@register');
+
+Route::get('posts', 'PostsController@index');
+Route::get('posts/{post}', 'PostsController@show');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    Route::post('posts', 'PostsController@store');
 
     Route::delete('/logout', 'AuthController@logout');
 });
