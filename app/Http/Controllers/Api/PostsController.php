@@ -37,11 +37,13 @@ class PostsController extends Controller
      * Display the specified resource.
      *
      * @param Post $post
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show(Post $post)
+    public function show(Post $post): JsonResponse
     {
-        //
+        return response()->json([
+            $post
+        ], 200);
     }
 
     /**
