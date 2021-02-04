@@ -7,7 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use App\Http\Resources\CommentResource;
 
 class CommentsController extends Controller
 {
@@ -15,19 +15,11 @@ class CommentsController extends Controller
      * Display a listing of the resource.
      *
      * @param Post|null $post
-     * @return JsonResponse
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Post $post = null): JsonResponse
+    public function index(Post $post): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        if (null != $post) {
-            // Get comments for specific post.
-            return response()->json(
-                $post->comments()->paginate()
-            );
-        } else {
-            // Get all comments site wide.
-            return response()->json(Comment::paginate());
-        }
+        return CommentResource::collection($post->comments()->paginate());
     }
 
     /**
