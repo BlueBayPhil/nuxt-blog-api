@@ -3,32 +3,41 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
-class PostsController extends Controller
+class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param Post|null $post
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Post $post = null): JsonResponse
     {
-        $posts = new Collection(Post::paginate());
-
-        return response()->json($posts);
+        if (null != $post) {
+            // Get comments for specific post.
+            return response()->json(
+                $post->comments()->paginate()
+            );
+        } else {
+            // Get all comments site wide.
+            return response()->json(Comment::paginate());
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param Post $post
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Post $post)
     {
         //
     }
@@ -36,12 +45,12 @@ class PostsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Post $post
+     * @param Comment $comment
      * @return JsonResponse
      */
-    public function show(Post $post): JsonResponse
+    public function show(Comment $comment)
     {
-        return response()->json($post, 200);
+        return response()->json($comment);
     }
 
     /**
@@ -64,6 +73,6 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        //w
+        //
     }
 }
