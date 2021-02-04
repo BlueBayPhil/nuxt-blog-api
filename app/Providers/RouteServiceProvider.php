@@ -47,6 +47,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+
+        // Explicitly bind post routes so we can use either the id or slug to retrieve them.
+        Route::bind('post', function ($value) {
+            return \App\Models\Post::where('id', $value)->orWhere('slug', $value)->first();
+        });
     }
 
     /**

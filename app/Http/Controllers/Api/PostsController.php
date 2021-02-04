@@ -17,7 +17,7 @@ class PostsController extends Controller
      */
     public function index(): JsonResponse
     {
-        $posts = new Collection(Post::paginate());
+        $posts = Post::paginate();
 
         return response()->json($posts);
     }

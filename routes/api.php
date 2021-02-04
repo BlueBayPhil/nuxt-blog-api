@@ -14,13 +14,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Authentication routes
+// Authentication routes.
 Route::post('/login', 'AuthController@login');
 Route::post('/register', 'AuthController@register');
 
+// Public post routes.
 Route::get('/posts', 'PostsController@index');
 Route::get('/posts/{post}', 'PostsController@show');
-Route::get('/comments/{comment?}', 'CommentsController@index');
+
+// Public comment routes.
+Route::get('/posts/{post}/comments', 'CommentsController@index');
+Route::get('/comments', 'CommentsController@index');
+Route::get('/comments/{comment?}', 'CommentsController@show');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/user', function (Request $request) {
