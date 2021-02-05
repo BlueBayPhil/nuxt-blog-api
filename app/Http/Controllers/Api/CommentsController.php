@@ -8,30 +8,51 @@ use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Resources\CommentResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @param Post|null $post
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index(Post $post): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request, Post $post): AnonymousResourceCollection
     {
-        return CommentResource::collection($post->comments()->paginate());
+        $comments = $post->comments();
+        if ($request->has('sort') && $request->get('sort') == 'desc') {
+            $comments->orderBy('created_at', 'desc');
+        }
+
+        $perPage = $request->get('count') ?? 25;
+
+        return CommentResource::collection($comments->paginate($perPage));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param Post $post
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function store(Request $request, Post $post)
+    public function store(Request $request, Post $post): JsonResponse
     {
-        //
+        $request->validate([
+            'comment' => 'required|min:10|max:200'
+        ]);
+
+        $post->comments()->create([
+            'user_id' => $request->user()->id,
+            'message' => $request->get('comment')
+        ]);
+
+        return response()->json([
+            'success' => true
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -48,7 +69,7 @@ class CommentsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param int $id
      * @return \Illuminate\Http\Response
      */
