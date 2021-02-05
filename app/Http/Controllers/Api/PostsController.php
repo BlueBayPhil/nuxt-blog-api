@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PostCollection;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 
 class PostsController extends Controller
@@ -13,13 +16,16 @@ class PostsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return JsonResponse
+     * @param Request $request
+     * @return AnonymousResourceCollection
      */
-    public function index(): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $posts = Post::paginate();
+        $perPage = $request->get('count') ?? 25;
+        $order = $request->get('sort') ?? 'desc';
 
-        return response()->json($posts);
+
+        return PostResource::collection(Post::orderBy('created_at', $order)->paginate($perPage));
     }
 
     /**
