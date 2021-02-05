@@ -21,6 +21,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon created_at
  * @property Carbon updated_at
  * @method static paginate()
+ * @method static create(array $data)
  */
 class Post extends Model
 {

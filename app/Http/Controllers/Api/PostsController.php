@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PostCollection;
+use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Collection;
+use Illuminate\Http\Response;
 
 class PostsController extends Controller
 {
@@ -31,12 +32,23 @@ class PostsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param StorePostRequest $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request): JsonResponse
     {
-        //
+        $data = $request->validated();
+
+        if (!array_key_exists('published_at', $data) || is_null($data['published_at'])) {
+            $data['published_at'] = new Carbon(); // Set published_at to now for default.
+        }
+
+        $post = $request->user()->posts()->create($data);
+
+        return response()->json([
+            'success', true,
+            'url' => url('/api/post/' . $post->id)
+        ], Response::HTTP_CREATED);
     }
 
     /**
