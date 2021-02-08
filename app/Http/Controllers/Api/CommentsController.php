@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCommentRequest;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
@@ -69,13 +70,20 @@ class CommentsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param StoreCommentRequest $request
+     * @param Post $post
+     * @param Comment $comment
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(StoreCommentRequest $request, Post $post, Comment $comment): JsonResponse
     {
-        //
+        $data = $request->validated();
+
+        $comment->update($data);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
     /**

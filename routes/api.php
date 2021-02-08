@@ -34,7 +34,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/posts', 'PostsController@store');
     Route::put('/posts/{post}', 'PostsController@update');
-    Route::post('/posts/{post}/comments', 'CommentsController@store');
+    Route::apiResource('/posts/{post}/comments', 'CommentsController');
+    // Route::post('/posts/{post}/comments', 'CommentsController@store');
 
     Route::delete('/logout', 'AuthController@logout');
 });
