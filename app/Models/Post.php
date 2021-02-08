@@ -47,6 +47,18 @@ class Post extends Model
         'published_at'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+        parent::creating(function(Post $post) {
+            // Ensure description is set.
+            if(empty($post->description) || is_null($post->description)) {
+                // No description set. Set to a substr() of the content.
+                $post->description = substr($post->content, 0, 200);
+            }
+        });
+    }
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

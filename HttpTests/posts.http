@@ -1,4 +1,4 @@
-GET http://localhost:8000/api/posts
+GET http://localhost:8000/api/posts?count=5
 Accept: application/json
 
 ###
