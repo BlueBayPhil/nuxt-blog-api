@@ -65,13 +65,19 @@ class PostsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param StorePostRequest $request
+     * @param Post $post
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(StorePostRequest $request, Post $post): JsonResponse
     {
-        //
+        $data = $request->validated();
+
+        $post->update($data);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
     /**
