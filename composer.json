@@ -14,11 +14,13 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.12",
         "laravel/sanctum": "^2.9",
+        "laravel/socialite": "^5.1",
         "laravel/tinker": "^2.5",
         "spatie/laravel-sluggable": "^2.6",
         "spatie/phpunit-snapshot-assertions": "^4.2"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.0",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
