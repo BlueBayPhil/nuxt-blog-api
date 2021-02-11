@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -22,9 +24,14 @@ class AuthController extends Controller
         $data = $request->validated();
 
         if (Auth::attempt($data)) {
+            /** @var User $user */
+            $user = User::where('email', '=', $data['email'])->get()->first();
+
             return response()->json([
                 'success' => true,
-                'user' => User::where('email', '=', $data['email'])->get()->first()
+                'user' => User::where('email', '=', $data['email'])->get()->first(),
+                'token' => $user->createToken('frontend')->plainTextToken,
+                'token_type' => 'Bearer'
             ], Response::HTTP_OK);
         }
 
@@ -64,5 +71,64 @@ class AuthController extends Controller
         return response()->json([
             'success' => true
         ], Response::HTTP_OK);
+    }
+
+    public function redirectToProvider(string $provider)
+    {
+
+
+        return Socialite::driver($provider)->stateless()->redirect();
+    }
+
+    public function handleProviderCallback(string $provider)
+    {
+        $validated = $this->validateProvider($provider);
+        if (!is_null($validated)) {
+            return $validated;
+        }
+
+        try {
+            $user = Socialite::driver($provider)->stateless()->user();
+        } catch (ClientException $e) {
+            return response()->json([
+                'error' => 'Invalid credentials provided.'
+            ], 422);
+        }
+
+        $userCreated = User::firstOrCreate([
+            'email' => $user->getEmail()
+        ], [
+            'email_verified_at' => now(),
+            'name' => $user->getName(),
+            'status' => true
+        ]);
+        $userCreated->providers()->updateOrCreate(
+            [
+                'provider' => $provider,
+                'provider_id' => $user->getId()
+            ],
+            [
+                'avatar' => $user->getAvatar()
+            ]
+        );
+
+        $token = $userCreated->createToken('socialite')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'user' => $userCreated
+        ], 200, ['Access-Token' => $token]);
+    }
+
+    private function validateProvider(string $provider)
+    {
+        return null;
+        if (!in_array($provider, ['github'])) {
+            return response()->json([
+                'error' => 'Invalid provider.'
+            ], 422);
+        } else {
+            return true;
+        }
     }
 }

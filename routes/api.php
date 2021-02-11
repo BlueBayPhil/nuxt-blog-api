@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 // Authentication routes.
 Route::post('/login', 'AuthController@login');
 Route::post('/register', 'AuthController@register');
+Route::get('login/{provider}', 'AuthController@redirectToProvider');
+Route::get('/login/{provider}/callback', 'Authcontroller@handleProviderCallback');
 
 // Public post routes.
 Route::get('/posts', 'PostsController@index');
