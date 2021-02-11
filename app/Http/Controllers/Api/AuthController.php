@@ -24,9 +24,14 @@ class AuthController extends Controller
         $data = $request->validated();
 
         if (Auth::attempt($data)) {
+            /** @var User $user */
+            $user = User::where('email', '=', $data['email'])->get()->first();
+
             return response()->json([
                 'success' => true,
-                'user' => User::where('email', '=', $data['email'])->get()->first()
+                'user' => User::where('email', '=', $data['email'])->get()->first(),
+                'token' => $user->createToken('frontend')->plainTextToken,
+                'token_type' => 'Bearer'
             ], Response::HTTP_OK);
         }
 
