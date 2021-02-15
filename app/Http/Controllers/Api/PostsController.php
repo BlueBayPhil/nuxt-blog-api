@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -41,6 +42,11 @@ class PostsController extends Controller
 
         if (!array_key_exists('published_at', $data) || is_null($data['published_at'])) {
             $data['published_at'] = new Carbon(); // Set published_at to now for default.
+        }
+
+        if(array_key_exists('image', $data) && !empty($data['image'])) {
+            $path = $request->file('image')->storePublicly('public/postImages');
+            $data['image'] = url(Storage::url($path));
         }
 
         $post = $request->user()->posts()->create($data);

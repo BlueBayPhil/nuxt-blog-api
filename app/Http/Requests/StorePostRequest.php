@@ -28,7 +28,8 @@ class StorePostRequest extends FormRequest
             'title' => 'required',
             'description' => 'sometimes|nullable',
             'content' => 'required',
-            'published_at' => 'sometimes|nullable'
+            'published_at' => 'sometimes|nullable',
+            'image' => 'sometimes|nullable|file|image'
         ];
     }
 }

@@ -33,6 +33,7 @@ class Post extends Model
         'slug',
         'description',
         'content',
+        'image',
         'published',
         'published_at'
     ];
