@@ -11,15 +11,17 @@ use Spatie\Sluggable\SlugOptions;
 
 /**
  * Class Post
+ *
  * @package App\Models
- * @property string title
- * @property string slug
- * @property string description
- * @property string content
+ * @property string  title
+ * @property string  slug
+ * @property string  description
+ * @property string  content
+ * @property string  image
  * @property boolean published
- * @property Carbon published_at
- * @property Carbon created_at
- * @property Carbon updated_at
+ * @property Carbon  published_at
+ * @property Carbon  created_at
+ * @property Carbon  updated_at
  * @method static paginate()
  * @method static create(array $data)
  */
@@ -34,7 +36,8 @@ class Post extends Model
         'description',
         'content',
         'published',
-        'published_at'
+        'published_at',
+        'image',
     ];
 
     protected $casts = [
@@ -52,10 +55,12 @@ class Post extends Model
         parent::boot();
         parent::creating(function(Post $post) {
             // Ensure description is set.
-            if(empty($post->description) || is_null($post->description)) {
+            if (empty($post->description) || is_null($post->description)) {
                 // No description set. Set to a substr() of the content.
                 $post->description = substr($post->content, 0, 200);
             }
+
+            $post->published_at = new Carbon();
         });
     }
 

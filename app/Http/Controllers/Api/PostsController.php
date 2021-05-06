@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -33,17 +34,29 @@ class PostsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StorePostRequest $request
+     *
      * @return JsonResponse
+     * @throws \Exception
      */
     public function store(StorePostRequest $request): JsonResponse
     {
         $data = $request->validated();
 
-        if (!array_key_exists('published_at', $data) || is_null($data['published_at'])) {
-            $data['published_at'] = new Carbon(); // Set published_at to now for default.
+        if (isset($data['image'])) {
+            $data['image'] = $request->file('image')->store('posts');
         }
 
-        $post = $request->user()->posts()->create($data);
+        try {
+            $post = $request->user()->posts()->create($data);
+        } catch (\Exception $e) {
+            // Delete uploaded image when post creation failed to prevent orphaned files
+            if (isset($data['image'])) {
+                Storage::delete($data['image']);
+            }
+
+            // Bubble up
+            throw $e;
+        }
 
         return response()->json([
             'success', true,
