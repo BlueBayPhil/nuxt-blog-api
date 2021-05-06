@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use function MongoDB\BSON\toJSON;
 
 class PostsController extends Controller
 {
@@ -68,11 +69,12 @@ class PostsController extends Controller
      * Display the specified resource.
      *
      * @param Post $post
-     * @return JsonResponse
+     *
+     * @return string
      */
-    public function show(Post $post): JsonResponse
+    public function show(Post $post): string
     {
-        return response()->json($post, 200);
+        return (new PostResource($post))->toJson();
     }
 
     /**
